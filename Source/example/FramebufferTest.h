@@ -15,10 +15,9 @@ public:
     FramebufferTest(NanoVGGraphics&);
     ~FramebufferTest() override;
 
-    // create font
+    // initialises a font in NanoVG
     int onContextCreated() override;
     void draw() override;
-
     void resized() override;
 
 private:

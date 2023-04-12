@@ -6,19 +6,15 @@ Contains a LowLevelGraphicsContext and attachable component for rendering JUCE p
 
 A work-in-progress, currently only works on MacOS with Metal and Windows with DirectX 11. I expect to add better Linux support at some point, but if you have experience with NanoVG, OpenGL or Vulkan, let me know!
 
-## iGraphics
-
-If you are familiar with the iGraphics class from [iPlug2](https://github.com/iPlug2/iPlug2), you may be interested in the stripped back implementation found [here](Source/NanoVGGraphics.h).
-
 ## Framebuffers
 
 A framebuffer is an image/texture living in your GPUs RAM.
 
 If you prefer to draw shapes solely using the NanoVG API, you will quickly find your GPU usage shoots up from all the draw calls.
 
-In that case, it may be helpful to cache the static parts of your GUI by painting to an image or _framebuffer_. This way you can instead paint the framebuffer on every frame.
+In that case, it may be helpful to cache the static parts of your GUI by painting to an image or _framebuffer_. This way you can save draw calls by painting a single pre-rendered image (framebuffer).
 
-Some examples of caching with framebuffers can be found [here](Source/example/CacheTest.h)
+An example of caching with framebuffers can be found [here](Source/example/FramebufferTest.h)
 
 ## Screenshots
 

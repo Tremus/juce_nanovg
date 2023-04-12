@@ -74,7 +74,7 @@ void FramebufferTest::draw()
 
 void FramebufferTest::resized()
 {
-    juce::Rectangle<float> bounds = getBounds().toFloat();
+    auto bounds = getBounds().toFloat();
     bounds.setWidth(bounds.getWidth() * 0.5f);
     framebuffer.setBounds(
         bounds.getX(),

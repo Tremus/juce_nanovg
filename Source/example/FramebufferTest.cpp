@@ -1,10 +1,10 @@
-#include "CacheTest.h"
+#include "FramebufferTest.h"
 #include <BinaryData.h>
 
 
 //==============================================================================
 
-ScopedFramebufferTest::ScopedFramebufferTest(NanoVGGraphics& g)
+FramebufferTest::FramebufferTest(NanoVGGraphics& g)
     : graphics(g)
     , framebuffer(g)
 {
@@ -15,16 +15,16 @@ ScopedFramebufferTest::ScopedFramebufferTest(NanoVGGraphics& g)
     addComponentListener(&graphics);
 }
 
-ScopedFramebufferTest::~ScopedFramebufferTest()
+FramebufferTest::~FramebufferTest()
 {
 }
 
-int ScopedFramebufferTest::onContextCreated()
+int FramebufferTest::onContextCreated()
 {
     robotoFontId = nvgCreateFontMem(graphics.getContext(), "robotoRegular", (unsigned char*)BinaryData::RobotoRegular_ttf, BinaryData::RobotoRegular_ttfSize, 0);
 }
 
-void ScopedFramebufferTest::draw()
+void FramebufferTest::draw()
 {
     NVGcontext* ctx = graphics.getContext();
 
@@ -72,7 +72,7 @@ void ScopedFramebufferTest::draw()
     drawCount++;
 }
 
-void ScopedFramebufferTest::resized()
+void FramebufferTest::resized()
 {
     juce::Rectangle<float> bounds = getBounds().toFloat();
     bounds.setWidth(bounds.getWidth() * 0.5f);

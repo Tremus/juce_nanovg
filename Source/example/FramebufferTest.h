@@ -8,12 +8,12 @@
 /**
  * Binds & unbinds framebuffers in a neat RAII style way
  */
-class ScopedFramebufferTest
+class FramebufferTest
     : public NanoVGGraphics::Renderer
 {
 public:
-    ScopedFramebufferTest(NanoVGGraphics&);
-    ~ScopedFramebufferTest() override;
+    FramebufferTest(NanoVGGraphics&);
+    ~FramebufferTest() override;
 
     // create font
     int onContextCreated() override;

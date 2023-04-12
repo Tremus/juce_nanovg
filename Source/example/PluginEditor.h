@@ -2,7 +2,7 @@
 #include "PluginProcessor.h"
 // #include "MainComponent.h"
 #include "NVGDemoComponent.h"
-#include "CacheTest.h"
+#include "FramebufferTest.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -21,7 +21,7 @@ private:
     // MainComponent comp;
     // NVGDemoComponent comp;
     NanoVGGraphics graphics;
-    ScopedFramebufferTest comp;
+    FramebufferTest comp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };

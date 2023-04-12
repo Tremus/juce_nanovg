@@ -4,20 +4,15 @@
 
 //==============================================================================
 
-class NVGDemoComponent
-    : public juce::Component
-    , public NanoVGGraphics
+class NVGDemoComponent : public NanoVGGraphics::Renderer
 {
 public:
-    NVGDemoComponent();
+    NVGDemoComponent(NanoVGGraphics&);
     ~NVGDemoComponent() override;
 
     void mouseMove (const juce::MouseEvent& e) override;
-    void contextCreated(NVGcontext*) override;
-    void resized() override;
-    void paint(juce::Graphics&) override;
-    void drawCachable(NanoVGGraphics& g) override;
-    void drawAnimated(NanoVGGraphics& g) override;
+    int onContextCreated() override;
+    void draw() override;
 
 private:
     int loadDemoData(NVGcontext* vg);
@@ -107,6 +102,7 @@ private:
         double startTime = 0;
     };
 
+    NanoVGGraphics& graphics;
     float mouseX, mouseY = 0.0f;
     glfwLikeTimer timer;
     double prevTime = 0;

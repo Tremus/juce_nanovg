@@ -39,19 +39,14 @@ int NVGDemoComponent::isBlack(NVGcolor col)
 	return 0;
 }
 
-NVGDemoComponent::NVGDemoComponent(): NanoVGGraphics(*(juce::Component*)this)
+NVGDemoComponent::NVGDemoComponent(NanoVGGraphics& g): graphics(g)
 {
-	// gets limited to 60 anyway on macos
-    startTimerHz(100);
 }
 
 NVGDemoComponent::~NVGDemoComponent()
 {
-    if (demoDataInitialised)
-	{
-		if (auto* nvg = getContext())
-        	freeDemoData(nvg);
-	}
+	if (auto* nvg = graphics.getContext())
+		freeDemoData(nvg);
 }
 
 //==============================================================================
@@ -63,12 +58,11 @@ void NVGDemoComponent::mouseMove (const juce::MouseEvent& e)
 	// DBG(e.position.toString());
 }
 
-void NVGDemoComponent::contextCreated(NVGcontext* vg)
+int NVGDemoComponent::onContextCreated()
 {
-    if (!demoDataInitialised && loadDemoData(vg) == 0)
+	auto* vg = graphics.getContext();
+    if (loadDemoData(vg) == 0)
     {
-        demoDataInitialised = true;
-
         timer.setTime(0);
         prevTime = timer.getTime();
 
@@ -76,37 +70,18 @@ void NVGDemoComponent::contextCreated(NVGcontext* vg)
     }
 	else
 	{
-		jassertfalse;
+		return 1;
 	}
 }
 
-void NVGDemoComponent::resized()
+void NVGDemoComponent::draw()
 {
-	bounds.L = getX();
-	bounds.T = getY();
-	bounds.R = getRight();
-	bounds.B = getBottom();
-}
-
-void NVGDemoComponent::paint(juce::Graphics&)
-{
-	render();
-}
-
-void NVGDemoComponent::drawCachable(NanoVGGraphics& g)
-{
-}
-
-void NVGDemoComponent::drawAnimated(NanoVGGraphics& g)
-{
-	if (!demoDataInitialised) return;
-
     auto timeSeconds = timer.getTime();
     auto dt = timeSeconds - prevTime;
     prevTime = timeSeconds;
 	updateGraph(&performanceGraph, dt);
 
-	auto* nvg = g.getContext();
+	auto* nvg = graphics.getContext();
 
 	auto premult = juce::KeyPress::isKeyCurrentlyDown('p');
 	if (premult)

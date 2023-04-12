@@ -1,77 +1,42 @@
 #include "NanoVGGraphicsStructs.h"
 #include "NanoVGGraphics.h"
 
-APIBitmap::APIBitmap(NanoVGGraphics& g, int width_, int height_, float scale_, float drawScale_)
-    : width(width_)
-    , height(height_)
-    , scale(scale_)
-    , drawScale(drawScale_)
-    , graphics(g)
-    , FBO(nvgCreateFramebuffer(g.getContext(), width, height, 0))
-{
-}
-
-APIBitmap::~APIBitmap()
-{
-    if(FBO)
-        graphics.deleteFBO(FBO);
-}
-
-Layer::Layer(APIBitmap* bmp, const Rect& layerRect, ComponentLayer* comp)
-    : bitmap(bmp)
-    , component(comp)
-    , componentRect(comp->bounds)
-    , rect(layerRect)
-    , invalid(false)
-{
-}
-
-void ComponentLayer::draw(NanoVGGraphics& g)
-{
-    jassert(!bounds.isEmpty());
-    if(useLayer)
-    {
-        if (!g.checkLayer(layer))
-        {
-            g.startLayer(this, bounds);
-            drawCachable(g);
-            layer = g.endLayer();
-        }
-
-        g.drawLayer(layer, &blend);
-    }
-    else
-        drawCachable(g);
-
-    drawAnimated(g);
-}
 
 //==============================================================================
 
-Framebuffer::~Framebuffer()
+Framebuffer::Framebuffer(NanoVGGraphics& g): graphics(g)
 {
-    if (fb)
-        nvgDeleteFramebuffer(ctx, fb);
 }
 
-void Framebuffer::init(NVGcontext* context)
+Framebuffer::~Framebuffer()
 {
-    ctx = context;
-
-    if (width > 0 && height > 0)
-        fb = nvgCreateFramebuffer(ctx, width, height, 0);
+    if (auto* ctx = graphics.getContext())
+        nvgDeleteFramebuffer(ctx, fbo);
 }
 
 void Framebuffer::paint()
 {
-    jassert(ctx != nullptr);
-    jassert(fb != nullptr);
+    jassert(fbo != nullptr);
+    auto* ctx = graphics.getContext();
+    float scale = graphics.getFramebufferTransformScale();
+    NVGpaint img;
+    memset(&img, 0, sizeof(NVGpaint));
 
-    NVGpaint paint= nvgImagePattern(ctx, x, y, width, height, 0.0f, fb->image, 1.0f);
+    nvgTransformScale(img.xform, scale, scale);
+    img.extent[0] = width * graphics.getPixelScale();
+    img.extent[1] = height * graphics.getPixelScale();
+    img.innerColor = nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f);
+    img.image = fbo->image;
+
+    nvgSave(ctx);
+
     nvgBeginPath(ctx); // clears existing path cache
     nvgRect(ctx, x, y, width, height); // fills the path with a rectangle
-    nvgFillPaint(ctx, paint); // sets the paint settings to the current state
+    nvgFillPaint(ctx, img); // sets the paint settings to the current state
     nvgFill(ctx); // draw call happens here, using the paint settings
+
+    nvgResetTransform(ctx);
+    nvgRestore(ctx);
 }
 
 void Framebuffer::setBounds(float x_, float y_, float width_, float height_)
@@ -83,36 +48,50 @@ void Framebuffer::setBounds(float x_, float y_, float width_, float height_)
 
     // invalidate
     valid = false;
-
-    // Unfornately there is no way to simply resize the existing texture...
-    // https://github.com/Microsoft/DirectXTK/issues/93
-    if (fb)
-        nvgDeleteFramebuffer(ctx, fb);
-
-    if (ctx)
-        fb = nvgCreateFramebuffer(ctx, width, height, 0);
 }
 
 //==============================================================================
 
-Framebuffer::ScopedBind::ScopedBind(NanoVGGraphics& g, Framebuffer& f)
-    : graphics(g)
-    , fb(f)
+Framebuffer::ScopedBind::ScopedBind(Framebuffer& f)
+    : fb(f)
 {
     DBG("binding texture");
-    auto* ctx = graphics.getContext();
+    auto* ctx = fb.graphics.getContext();
+    float pixelScale = fb.graphics.getPixelScale();
+    jassert(ctx != nullptr);
+    jassert(!fb.valid);
+
+    jassert(fb.width > 0);
+    jassert(fb.height > 0);
+
+    // Unfornately there is no way to simply resize the existing texture...
+    // https://github.com/Microsoft/DirectXTK/issues/93
+    if (fb.fbo == nullptr)
+        nvgDeleteFramebuffer(ctx, fb.fbo);
+
+    fb.fbo = nvgCreateFramebuffer(
+        ctx,
+        juce::roundToInt(fb.width * pixelScale),
+        juce::roundToInt(fb.height * pixelScale),
+        0);
+
     nvgEndFrame(ctx);
-    nvgBindFramebuffer(fb.get());
-    nvgBeginFrame(ctx, fb.getWidth(), fb.getHeight(), 1.0f);
+
+    nvgBindFramebuffer(fb.fbo);
+    nvgBeginFrame(ctx, fb.width, fb.height, pixelScale);
 }
 
 Framebuffer::ScopedBind::~ScopedBind()
 {
     DBG("releasing bind");
-    auto* ctx = graphics.getContext();
+    auto* ctx = fb.graphics.getContext();
     nvgEndFrame(ctx);
-    fb.setValid(true);
+    fb.valid = true;
 
-    nvgBindFramebuffer(graphics.getMainFramebuffer());
-    nvgBeginFrame(ctx, graphics.getWindowWidth(), graphics.getWindowHeight(), 1.0f);
+    nvgBindFramebuffer(fb.graphics.getMainFramebuffer());
+    nvgBeginFrame(
+        ctx,
+        fb.graphics.getWindowWidth(),
+        fb.graphics.getWindowHeight(),
+        fb.graphics.getPixelScale());
 }

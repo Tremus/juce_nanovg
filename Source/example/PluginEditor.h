@@ -19,9 +19,9 @@ private:
     // access the processor object that created it.
     AudioPluginAudioProcessor& processorRef;
     // MainComponent comp;
-    NVGDemoComponent comp;
-    // CacheTest comp;
-    // ScopedFramebufferTest comp;
+    // NVGDemoComponent comp;
+    NanoVGGraphics graphics;
+    ScopedFramebufferTest comp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };

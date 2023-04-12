@@ -3,7 +3,9 @@
 
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+    : AudioProcessorEditor (&p)
+    , processorRef (p)
+    , comp(graphics)
 {
     juce::ignoreUnused (processorRef);
     setCachedComponentImage(nullptr);

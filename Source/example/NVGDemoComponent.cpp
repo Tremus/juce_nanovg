@@ -39,8 +39,11 @@ int NVGDemoComponent::isBlack(NVGcolor col)
 	return 0;
 }
 
-NVGDemoComponent::NVGDemoComponent(NanoVGGraphics& g): graphics(g)
+NVGDemoComponent::NVGDemoComponent(NanoVGGraphics& g)
+	: graphics(g)
 {
+	graphics.setComponent(this);
+	addComponentListener(&graphics);
 }
 
 NVGDemoComponent::~NVGDemoComponent()
@@ -67,6 +70,7 @@ int NVGDemoComponent::onContextCreated()
         prevTime = timer.getTime();
 
 		initGraph(&performanceGraph, GRAPH_RENDER_FPS, "Frame Time");
+		return 0;
     }
 	else
 	{

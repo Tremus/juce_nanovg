@@ -27,25 +27,25 @@ juce_add_plugin(${PROJECT_NAME}
 )
 
 juce_add_binary_data(staticFiles SOURCES
-    "Resources/Lucida Grande-Regular.ttf"
-    Resources/Verdana-Regular.ttf
-    modules/nanovg_dx11/example/images/image1.jpg
-    modules/nanovg_dx11/example/images/image2.jpg
-    modules/nanovg_dx11/example/images/image3.jpg
-    modules/nanovg_dx11/example/images/image4.jpg
-    modules/nanovg_dx11/example/images/image5.jpg
-    modules/nanovg_dx11/example/images/image6.jpg
-    modules/nanovg_dx11/example/images/image7.jpg
-    modules/nanovg_dx11/example/images/image8.jpg
-    modules/nanovg_dx11/example/images/image9.jpg
-    modules/nanovg_dx11/example/images/image10.jpg
-    modules/nanovg_dx11/example/images/image11.jpg
-    modules/nanovg_dx11/example/images/image12.jpg
-    modules/nanovg_dx11/example/entypo.ttf
-    modules/nanovg_dx11/example/NotoEmoji-Regular.ttf
-    modules/nanovg_dx11/example/Roboto-Bold.ttf
-    modules/nanovg_dx11/example/Roboto-Light.ttf
-    modules/nanovg_dx11/example/Roboto-Regular.ttf
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Lucida Grande-Regular.ttf"
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Verdana-Regular.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image1.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image2.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image3.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image4.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image5.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image6.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image7.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image8.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image9.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image10.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image11.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/images/image12.jpg
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/entypo.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/NotoEmoji-Regular.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/Roboto-Bold.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/Roboto-Light.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/example/Roboto-Regular.ttf
 )
 
 #-------- nanovg --------
@@ -73,7 +73,6 @@ target_compile_definitions(${PROJECT_NAME}
         JUCE_DISPLAY_SPLASH_SCREEN=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         DONT_SET_USING_JUCE_NAMESPACE=1
-        GLEW_STATIC
 )
 
 target_include_directories(${PROJECT_NAME}

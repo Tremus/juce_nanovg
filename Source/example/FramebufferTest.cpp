@@ -22,6 +22,7 @@ FramebufferTest::~FramebufferTest()
 int FramebufferTest::onContextCreated()
 {
     robotoFontId = nvgCreateFontMem(graphics.getContext(), "robotoRegular", (unsigned char*)BinaryData::RobotoRegular_ttf, BinaryData::RobotoRegular_ttfSize, 0);
+    return 0;
 }
 
 void FramebufferTest::draw()
@@ -43,7 +44,7 @@ void FramebufferTest::draw()
         nvgFillColor(ctx, nvgRGBAf(0.8f, 0.8f, 0.2f, 1.0f));
         nvgFill(ctx);
 
-        nvgFontFaceId(ctx, robotoFontId);
+        // nvgFontFaceId(ctx, robotoFontId);
         nvgFontSize(ctx, 12.0f);
         nvgTextAlign(ctx, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgFillColor(ctx, nvgRGBAf(0.0f, 0.0f, 0.0f, 1.0f));
@@ -58,7 +59,7 @@ void FramebufferTest::draw()
     }
     framebuffer.paint();
 
-    nvgFontFaceId(ctx, robotoFontId);
+    // nvgFontFaceId(ctx, robotoFontId);
     nvgFontSize(ctx, 12.0f);
     nvgTextAlign(ctx, NVG_ALIGN_CENTER|NVG_ALIGN_MIDDLE);
     nvgFillColor(ctx, nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f));

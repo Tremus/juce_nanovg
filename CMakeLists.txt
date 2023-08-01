@@ -24,6 +24,10 @@ juce_add_plugin(${PROJECT_NAME}
     FORMATS AU VST3 Standalone
     PRODUCT_NAME ${PROJECT_NAME}
     IS_SYNTH TRUE # disables "Audio input muted" notification.
+    IS_MIDI_EFFECT FALSE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT FALSE
+    COPY_PLUGIN_AFTER_BUILD FALSE
 )
 
 juce_add_binary_data(staticFiles SOURCES
@@ -102,7 +106,6 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
 )
 
 if (WIN32)

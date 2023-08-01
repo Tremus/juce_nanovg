@@ -123,7 +123,6 @@ void NanoVGGraphics::render()
             return;
     }
 
-    DBG(framebufferTransformScale);
     beginFrame();
     component->draw();
     endFrame();

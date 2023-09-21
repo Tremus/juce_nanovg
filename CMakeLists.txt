@@ -54,21 +54,7 @@ juce_add_binary_data(staticFiles SOURCES
 
 #-------- nanovg --------
 
-set(NANOVG_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/Source/nanovg_compat/nanovg_compat.c)
-if(APPLE)
-    list(APPEND NANOVG_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/Source/nanovg_compat/nanovg_compat.m)
-endif()
-
-add_library(nanovg STATIC ${NANOVG_SRC})
-target_include_directories(nanovg
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/modules/MetalNanoVG/src)
-
-if(APPLE)
-    set_property (TARGET nanovg APPEND_STRING PROPERTY
-                    COMPILE_FLAGS "-fobjc-arc")
-endif()
+add_subdirectory(modules/nanovg_compat)
 
 #---------------------
     
@@ -82,8 +68,9 @@ target_compile_definitions(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/modules/JUCE/modules
-        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_dx11/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/modules/MetalNanoVG/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/modules/nanovg_dx11/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/modules/MetalNanoVG/src
 )
 
 target_sources(${PROJECT_NAME}

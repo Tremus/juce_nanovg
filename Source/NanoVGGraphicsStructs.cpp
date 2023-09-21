@@ -11,12 +11,12 @@ Framebuffer::Framebuffer(NanoVGGraphics& g): graphics(g)
 Framebuffer::~Framebuffer()
 {
     if (auto* ctx = graphics.getContext())
-        nvgDeleteFramebuffer(ctx, fbo);
+        nvgDeleteImage(ctx, fbo);
 }
 
 void Framebuffer::paint()
 {
-    jassert(fbo != nullptr);
+    jassert(fbo != 0);
     auto* ctx = graphics.getContext();
     float scale = graphics.getFramebufferTransformScale();
     NVGpaint img;
@@ -26,7 +26,7 @@ void Framebuffer::paint()
     img.extent[0] = width * graphics.getPixelScale();
     img.extent[1] = height * graphics.getPixelScale();
     img.innerColor = nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f);
-    img.image = fbo->image;
+    img.image = fbo;
 
     nvgSave(ctx);
 
@@ -66,8 +66,8 @@ Framebuffer::ScopedBind::ScopedBind(Framebuffer& f)
 
     // Unfornately there is no way to simply resize the existing texture...
     // https://github.com/Microsoft/DirectXTK/issues/93
-    if (fb.fbo == nullptr)
-        nvgDeleteFramebuffer(ctx, fb.fbo);
+    if (fb.fbo != 0)
+        nvgDeleteImage(ctx, fb.fbo);
 
     fb.fbo = nvgCreateFramebuffer(
         ctx,
@@ -77,18 +77,18 @@ Framebuffer::ScopedBind::ScopedBind(Framebuffer& f)
 
     nvgEndFrame(ctx);
 
-    nvgBindFramebuffer(fb.fbo);
+    nvgBindFramebuffer(ctx, fb.fbo);
     nvgBeginFrame(ctx, fb.width, fb.height, pixelScale);
 }
 
 Framebuffer::ScopedBind::~ScopedBind()
 {
     DBG("releasing bind");
-    auto* ctx = fb.graphics.getContext();
+    NVGcontext* ctx = fb.graphics.getContext();
     nvgEndFrame(ctx);
     fb.valid = true;
 
-    nvgBindFramebuffer(fb.graphics.getMainFramebuffer());
+    nvgBindFramebuffer(ctx, fb.graphics.getMainFramebuffer());
     nvgBeginFrame(
         ctx,
         fb.graphics.getWindowWidth(),

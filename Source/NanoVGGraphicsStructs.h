@@ -35,7 +35,7 @@ struct Framebuffer
     void setBounds(float x, float y, float width, float height);
 
     NanoVGGraphics& graphics;
-    NVGframebuffer* fbo = nullptr;
+    int fbo = 0;
     // the above paint() method with use these coords to paint the image
     float x = 0, y = 0, width = 0, height = 0;
     bool valid = false;

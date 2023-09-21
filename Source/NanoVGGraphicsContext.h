@@ -3,32 +3,9 @@
 //
 
 #pragma once
-#include "nanovg_compat/nanovg_compat.h"
+#include <nanovg_compat.h>
 #include <juce_opengl/juce_opengl.h>
 
-#if defined NANOVG_GL2_IMPLEMENTATION
-    #define NANOVG_GL_IMPLEMENTATION 1
-    #define nvgCreateContext(flags) nvgCreateGL2(flags)
-    #define nvgDeleteContext(context) nvgDeleteGL2(context)
-#elif defined NANOVG_GLES2_IMPLEMENTATION
-    #define NANOVG_GL_IMPLEMENTATION 1
-    #define nvgCreateContext(flags) nvgCreateGLES2(flags)
-    #define nvgDeleteContext(context) nvgDeleteGLES2(context)
-#elif defined NANOVG_GL3_IMPLEMENTATION
-    #define NANOVG_GL_IMPLEMENTATION 1
-    #define nvgCreateContext(flags) nvgCreateGL3(flags)
-    #define nvgDeleteContext(context) nvgDeleteGL3(context)
-#elif defined NANOVG_GLES3_IMPLEMENTATION
-    #define NANOVG_GL_IMPLEMENTATION 1
-    #define nvgCreateContext(flags) nvgCreateGLES3(flags)
-    #define nvgDeleteContext(context) nvgDeleteGLES3(context)
-#elif defined NANOVG_METAL_IMPLEMENTATION
-    #define nvgCreateContext(layer, flags, w, h) mnvgCreateContext(layer, flags, w, h)
-    #define nvgDeleteContext(context) nvgDeleteMTL(context)
-    #define nvgBindFramebuffer(fb) mnvgBindFramebuffer(fb)
-    #define nvgCreateFramebuffer(ctx, w, h, flags) mnvgCreateFramebuffer(ctx, w, h, flags)
-    #define nvgDeleteFramebuffer(fb) mnvgDeleteFramebuffer(fb)
-#endif
 
 /**
     JUCE low level graphics context backed by nanovg.

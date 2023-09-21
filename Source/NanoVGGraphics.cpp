@@ -1,4 +1,5 @@
 #include "NanoVGGraphics.h"
+#include <nanovg_compat.h>
 
 
 NanoVGGraphics::NanoVGGraphics()
@@ -33,10 +34,14 @@ void NanoVGGraphics::componentMovedOrResized (juce::Component& comp, bool, bool 
 
         if (nvg)
         {
-            if (mainFrameBuffer != nullptr)
-                nvgDeleteFramebuffer(nvg, mainFrameBuffer);
+            if (mainFrameBuffer != 0)
+            {
+                nvgDeleteImage(nvg, mainFrameBuffer);
+                mainFrameBuffer = 0;
+            }
 
             nvgSetViewBounds(
+                nvg,
                 component->getPeer()->getNativeHandle(),
                 component->getWidth() * getPixelScale(),
                 component->getHeight() * getPixelScale());
@@ -96,8 +101,7 @@ bool NanoVGGraphics::initialise()
         getWindowWidth() * getPixelScale(),
         getWindowHeight() * getPixelScale(),
         0);
-    jassert(mainFrameBuffer != nullptr);
-    jassert(mainFrameBuffer->image > 0);
+    jassert(mainFrameBuffer != 0);
 
     component->onContextCreated();
 
@@ -108,7 +112,7 @@ bool NanoVGGraphics::initialise()
 void NanoVGGraphics::shutdown()
 {
     if (mainFrameBuffer)
-        nvgDeleteFramebuffer(nvg, mainFrameBuffer);
+        nvgDeleteImage(nvg, mainFrameBuffer);
     if (nvg)
         nvgDeleteContext(nvg);
 }
@@ -132,9 +136,9 @@ void NanoVGGraphics::beginFrame()
 {
     jassert(component->getWidth() > 0);
     jassert(component->getHeight() > 0);
-    jassert(mainFrameBuffer != nullptr);
+    jassert(mainFrameBuffer != 0);
 
-    nvgBindFramebuffer(mainFrameBuffer);
+    nvgBindFramebuffer(nvg, mainFrameBuffer);
     nvgBeginFrame(
         nvg,
         getWindowWidth(),
@@ -146,7 +150,7 @@ void NanoVGGraphics::endFrame()
 {
     nvgEndFrame(nvg);
     // bind to back buffer
-    nvgBindFramebuffer(nullptr);
+    nvgBindFramebuffer(nvg, 0);
     nvgBeginFrame(
         nvg,
         getWindowWidth(),
@@ -161,7 +165,7 @@ void NanoVGGraphics::endFrame()
     img.extent[0] = getWindowWidth() * getPixelScale();
     img.extent[1] = getWindowHeight() * getPixelScale();
     img.innerColor = nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f);
-    img.image = mainFrameBuffer->image;
+    img.image = mainFrameBuffer;
 
     nvgBeginPath(nvg);
     nvgRect(
@@ -178,6 +182,6 @@ void NanoVGGraphics::endFrame()
     nvgEndFrame(nvg);
 
 #ifdef _WIN32
-    d3dPresent();
+    d3dnvgPresent(nvg);
 #endif
 }

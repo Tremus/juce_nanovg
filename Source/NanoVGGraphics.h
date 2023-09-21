@@ -1,6 +1,6 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "nanovg_compat/nanovg_compat.h"
+#include <nanovg_compat.h>
 
 
 class NanoVGGraphics
@@ -28,7 +28,7 @@ public:
     void timerCallback() override;
 
     NVGcontext* getContext() const { return nvg; }
-    NVGframebuffer* getMainFramebuffer() const { return mainFrameBuffer; }
+    int getMainFramebuffer() const { return mainFrameBuffer; }
 
     // eg. 2 for mac retina, 1.5 for windows
     float getPixelScale() const noexcept { return pixelScale; }
@@ -52,7 +52,7 @@ private:
     Renderer* component;
 
     NVGcontext* nvg = nullptr;
-    NVGframebuffer* mainFrameBuffer = nullptr;
+    int mainFrameBuffer = 0;
     float pixelScale = 1.0f;
     float drawScale = 1.0f;
     // Used for scaling frame buffers when painting them

@@ -37,7 +37,7 @@ private:
     bool currentlyPainting {false};
     bool showRenderStats {false};
 
-    NVGframebuffer* mainFrameBuffer = nullptr;
+    int mainFrameBuffer = 0;
 
     std::unique_ptr<NanoVGGraphicsContext> nvgGraphicsContext {nullptr};
 

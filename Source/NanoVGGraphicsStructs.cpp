@@ -23,8 +23,8 @@ void Framebuffer::paint()
     memset(&img, 0, sizeof(NVGpaint));
 
     nvgTransformScale(img.xform, scale, scale);
-    img.extent[0] = width * graphics.getPixelScale();
-    img.extent[1] = height * graphics.getPixelScale();
+    img.extent[0] = width * graphics.pixelScale;
+    img.extent[1] = height * graphics.pixelScale;
     img.innerColor = nvgRGBAf(1.0f, 1.0f, 1.0f, 1.0f);
     img.image = fbo;
 
@@ -57,7 +57,7 @@ Framebuffer::ScopedBind::ScopedBind(Framebuffer& f)
 {
     DBG("binding texture");
     auto* ctx = fb.graphics.getContext();
-    float pixelScale = fb.graphics.getPixelScale();
+    float pixelScale = fb.graphics.pixelScale;
     jassert(ctx != nullptr);
     jassert(!fb.valid);
 
@@ -93,5 +93,5 @@ Framebuffer::ScopedBind::~ScopedBind()
         ctx,
         fb.graphics.getWindowWidth(),
         fb.graphics.getWindowHeight(),
-        fb.graphics.getPixelScale());
+        fb.graphics.pixelScale);
 }

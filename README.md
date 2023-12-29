@@ -2,9 +2,16 @@
 
 [NanoVG](https://github.com/memononen/nanovg) graphics module for [JUCE](https://github.com/juce-framework/JUCE), based on https://github.com/Archie3d/juce_bgfx
 
-Contains a LowLevelGraphicsContext and attachable component for rendering JUCE projects with NanoVG. See the example to find out how to implement this yourself.
+Contains a `juce::LowLevelGraphicsContext` and attachable component for rendering JUCE projects with NanoVG. See the example to find out how to implement this yourself. Note that this does not yet implement masking for arbitrary shapes, which is required for a fully functioning LowLevelGraphicsContext.
 
 A work-in-progress, currently only works on MacOS with Metal and Windows with DirectX 11. I expect to add better Linux support at some point, but if you have experience with NanoVG, OpenGL or Vulkan, let me know!
+
+## Build
+
+- `git clone https://github.com/Tremus/juce_nanovg`
+- `cd juce_nanovg`
+- `git submodule update --init --recursive --depth=1` (Use depth=1 to avoid downloading all of JUCEs git history)
+- Use CMake to build the _juce_nanovg_Standalone_ target.
 
 ## Framebuffers
 

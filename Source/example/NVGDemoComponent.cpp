@@ -118,14 +118,16 @@ void NVGDemoComponent::draw()
 
 #ifdef _WIN32
         // For some reason I'm not able to simply create a texture I can render to with CPU read & write permissions...
-        // Instead it seems I need 2 textures, 1: a render target, and 2: Staging (CPU read & write access)
+        // Instead it seems I need 2 types of textures, 1: a render target (GPU only access), and 2: Staging (CPU read & write access)
         // This introduces silly copying steps, whereby I:
-        //     1: Copy the Rendering tex to the Staging tex which I can CPU
+        //     1: Copy the Rendering tex to the Staging tex
         //     2: Read data from staging tex, modify & write back to staging tex
         //     3: Finally copy the staging tex back to the rendering tex
         int imgStaging = nvgCreateImageRGBA(nvg, scaledWidth, scaledHeight, NVG_IMAGE_USAGE_STAGING, NULL);
         d3dnvgCopyImage(nvg, imgStaging, graphics.mainFrameBuffer);
         nvgReadPixels(nvg, imgStaging, 0, 0, scaledWidth, scaledHeight, img_data);
+
+        // Because we only read from this image, we are now finished with this staging image
         nvgDeleteImage(gfx->nvg, imgStaging);
 #else
         nvgReadPixels(nvg, graphics.mainFrameBuffer, 0, 0, scaledWidth, scaledHeight, screenshotBuffer);
@@ -151,6 +153,8 @@ void NVGDemoComponent::draw()
         screenshotSaver->launchAsync (fileFlags, callback);
 
         // Note: If we were to edit the image pixel data CPU side, here's how we send the image back to the GPU.
+        // We would also delete the staging image here, after we copy our image back to the main framebuffer instead
+        // of straight after we read the pixel data like we have above.
         /*
 #ifdef _WIN32
         d3dnvgWriteImage(nvg, imgStaging, screenshotBuffer);

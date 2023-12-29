@@ -70,6 +70,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/modules/JUCE/modules
         ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/src
         ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/modules/nanovg_dx11/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/modules/nanovg_dx11/example
         ${CMAKE_CURRENT_SOURCE_DIR}/modules/nanovg_compat/modules/MetalNanoVG/src
 )
 

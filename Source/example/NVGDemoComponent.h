@@ -112,5 +112,11 @@ private:
 
     bool demoDataInitialised = false;
 
+    bool wasSavingScreenshot = false;
+
+    unsigned char* screenshotBuffer = NULL;
+    size_t screenshotBufferSize = 0;
+    std::unique_ptr<juce::FileChooser> screenshotSaver;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NVGDemoComponent)
 };

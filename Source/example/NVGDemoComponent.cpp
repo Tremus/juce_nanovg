@@ -1,6 +1,9 @@
-#include <cstdio>
-#include <BinaryData.h>
 #include "NVGDemoComponent.h"
+
+#include <BinaryData.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 
 #define ICON_SEARCH 0x1F50D
 #define ICON_CIRCLED_CROSS 0x2716
@@ -50,6 +53,9 @@ NVGDemoComponent::~NVGDemoComponent()
 {
 	if (auto* nvg = graphics.getContext())
 		freeDemoData(nvg);
+
+    if (screenshotBuffer)
+        free(screenshotBuffer);
 }
 
 //==============================================================================
@@ -80,20 +86,89 @@ int NVGDemoComponent::onContextCreated()
 
 void NVGDemoComponent::draw()
 {
-    auto timeSeconds = timer.getTime();
-    auto dt = timeSeconds - prevTime;
+    double timeSeconds = timer.getTime();
+    double dt = timeSeconds - prevTime;
     prevTime = timeSeconds;
 	updateGraph(&performanceGraph, dt);
 
-	auto* nvg = graphics.getContext();
+	NVGcontext* nvg = graphics.getContext();
 
-	auto premult = juce::KeyPress::isKeyCurrentlyDown('p');
+	bool premult = juce::KeyPress::isKeyCurrentlyDown('p');
 	if (premult)
 		nvgClearWithColor(nvg, nvgRGBA(0, 0, 0, 0));
 	else
 		nvgClearWithColor(nvg, nvgRGBAf(0.3f, 0.3f, 0.32f, 1.0f));
 	int blowup = (int)juce::KeyPress::isKeyCurrentlyDown(juce::KeyPress::spaceKey);
     renderDemo(nvg, mouseX,mouseY, getWidth(), getHeight(), (float)timeSeconds, blowup);
+
+    bool screenshot = juce::KeyPress::isKeyCurrentlyDown('s');
+    if (screenshot && !wasSavingScreenshot)
+    {
+        // save screenshot
+        nvgEndFrame(nvg);
+
+        int scaledWidth = graphics.getWindowWidth() * graphics.pixelScale;
+        int scaledHeight = graphics.getWindowHeight() * graphics.pixelScale;
+
+        size_t numBytes = scaledWidth * scaledHeight * 4; // 4 = 1 byte for each colour channel (RGBA)
+
+        if (numBytes != screenshotBufferSize)
+            screenshotBuffer = (unsigned char*)realloc(screenshotBuffer, numBytes);
+        screenshotBufferSize = numBytes;
+
+#ifdef _WIN32
+        // For some reason I'm not able to simply create a texture I can render to with CPU read & write permissions...
+        // Instead it seems I need 2 textures, 1: a render target, and 2: Staging (CPU read & write access)
+        // This introduces silly copying steps, whereby I:
+        //     1: Copy the Rendering tex to the Staging tex which I can CPU
+        //     2: Read data from staging tex, modify & write back to staging tex
+        //     3: Finally copy the staging tex back to the rendering tex
+        int imgStaging = nvgCreateImageRGBA(nvg, scaledWidth, scaledHeight, NVG_IMAGE_USAGE_STAGING, NULL);
+        d3dnvgCopyImage(nvg, imgStaging, graphics.mainFrameBuffer);
+        nvgReadPixels(nvg, imgStaging, 0, 0, scaledWidth, scaledHeight, img_data);
+        nvgDeleteImage(gfx->nvg, imgStaging);
+#else
+        nvgReadPixels(nvg, graphics.mainFrameBuffer, 0, 0, scaledWidth, scaledHeight, screenshotBuffer);
+#endif
+
+        if (!screenshotSaver)
+            screenshotSaver = std::make_unique<juce::FileChooser> ("Save", juce::File::getSpecialLocation(juce::File::userDesktopDirectory), "*.png");
+
+        auto callback = [this] (const juce::FileChooser& chooser)
+        {
+            auto file = chooser.getResult();
+
+            // if the user has clicked cancel, the path will be an empty string
+            if (file.getFullPathName().isEmpty())
+                return;
+
+            int w = graphics.getWindowWidth() * graphics.pixelScale;
+            int h = graphics.getWindowHeight() * graphics.pixelScale;
+            stbi_write_png(file.getFullPathName().getCharPointer(), w, h, 4, screenshotBuffer, w*4);
+        };
+
+        auto fileFlags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles;
+        screenshotSaver->launchAsync (fileFlags, callback);
+
+        // Note: If we were to edit the image pixel data CPU side, here's how we send the image back to the GPU.
+        /*
+#ifdef _WIN32
+        d3dnvgWriteImage(nvg, imgStaging, screenshotBuffer);
+        d3dnvgCopyImage(nvg, graphics.mainFrameBuffer, imgStaging);
+        nvgDeleteImage(nvg, imgStaging);
+#else
+        nvgUpdateImage(nvg, graphics.mainFrameBuffer, screenshotBuffer);
+#endif
+        */
+
+        nvgBeginFrame(
+            nvg,
+            graphics.getWindowWidth(),
+            graphics.getWindowHeight(),
+            graphics.pixelScale);
+    }
+    wasSavingScreenshot = screenshot;
+
     renderGraph(nvg, 5, 5, &performanceGraph);
 	renderDrawCallGraph(nvg);
 }
